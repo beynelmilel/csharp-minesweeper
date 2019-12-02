@@ -18,16 +18,20 @@ namespace Mayın_Tarlası
             InitializeComponent();
         }
         string yön;
-        int dakika , saniye ;
+        int dakika=0 , saniye=0 ;
         int satir=20, sütun=20;
         int alan_sütun = 10, alan_satir = 19;
         string oyuncu_ismi;
         int bomba_sayisi = 0;
         int[,] alan_2d = new int[20, 20] ;
-
+        int yakin_mayin = 0;
 
         private void mayin_tarlasi_Load(object sender, EventArgs e)
         {
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
 
             string dosya_yolu = @"C:\Users\DELL\Desktop\oynayanlar.txt";
             if (File.Exists(dosya_yolu) == false)
@@ -63,6 +67,7 @@ namespace Mayın_Tarlası
                 yön = "yukarı";
             }
 
+            yakin_mayin = 0;
 
             oyun_kontrol();
 
@@ -98,18 +103,33 @@ namespace Mayın_Tarlası
 
             if (zorluk_secimi == true)
             {
-                oyuncu_ismi = textBox1.Text;
-                MessageBox.Show(oyuncu_ismi + " Kaydedildi.");
+                if (textBox1.Text!="")
+                {
+                 oyuncu_ismi = textBox1.Text;
+                 MessageBox.Show(oyuncu_ismi + " Kaydedildi.");
 
-                timer1.Interval = 1000;
-                timer1.Enabled = true;
+                 timer1.Interval = 1000;
+                 timer1.Enabled = true;
+                }
+                else
+                {
+                    MessageBox.Show("Oyuncunun Adını Giriniz");
+                }
+                
             }
             else
             {
                 MessageBox.Show("Lütfen Zorluk Seçimi Yapınız.");
             }
+            if (button1.Enabled != true)
+            {
+                button1.Enabled = true;
+                button2.Enabled = true;
+                button3.Enabled = true;
+                button4.Enabled = true;
 
-
+            }
+            
             for (int i = 0; i < sütun; i++)
             {
                 for (int j = 0; j < satir; j++)
@@ -126,7 +146,7 @@ namespace Mayın_Tarlası
 
         public void oyun_kontrol()
         {
-            
+            yakin_mayin_kontrol(alan_sütun,alan_satir);
             if (yön=="aşağı")
             {
                 alan_satir++;
@@ -197,7 +217,7 @@ namespace Mayın_Tarlası
 
             }
 
-
+            yakin_mayin_kontrol(alan_sütun, alan_satir);
         }
 
         public void bomba_yerlesimi()
@@ -218,15 +238,53 @@ namespace Mayın_Tarlası
                 {
                     continue;
                 }
-            }          
+            }
+            yakin_mayin_kontrol(alan_sütun, alan_satir);
         }
         public void oyun_kaybetti()
         {
-            MessageBox.Show("oyunu kaybettiniz");
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
+            timer1.Enabled = false;
+            string dosya_yolu = @"C:\Users\DELL\Desktop\oynayanlar.txt";
+            FileStream fs = new FileStream(dosya_yolu, FileMode.OpenOrCreate, FileAccess.Write);
+
+            fs.Close();
+
+            File.AppendAllText(dosya_yolu, Environment.NewLine + oyuncu_ismi + "  " + süre.Text.ToString() + "  " + "Kaybetti");
+
+            dakika = 0; saniye=0;
+            satir = 20;  sütun = 20;
+            alan_sütun = 10; alan_satir = 19;
+            oyuncu_ismi="";
+            bomba_sayisi = 0;
+            yakin_mayin = 0;
+            MessageBox.Show("Oyunu kaybettiniz.");
         }
         public void oyun_kazandi()
         {
-            MessageBox.Show("tebrikler oyunu kazandınız.");
+            button1.Enabled = false;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false; 
+
+            timer1.Enabled = false;
+            string dosya_yolu = @"C:\Users\DELL\Desktop\oynayanlar.txt";
+            FileStream fs = new FileStream(dosya_yolu, FileMode.OpenOrCreate, FileAccess.Write);
+
+
+            fs.Close();
+            File.AppendAllText(dosya_yolu, Environment.NewLine + oyuncu_ismi + "  " + süre.Text.ToString() + "  " + "Kazandı");
+
+            dakika = 0; saniye = 0;
+            satir = 20; sütun = 20;
+            alan_sütun = 10; alan_satir = 19;
+            oyuncu_ismi = "";
+            bomba_sayisi = 0;
+            yakin_mayin = 0;
+            MessageBox.Show("Tebrikler oyunu kazandınız.");
         }
 
 
@@ -261,6 +319,77 @@ namespace Mayın_Tarlası
 
         }
 
+        public void yakin_mayin_kontrol(int ksütun, int ksatir )
+        {
+            if (ksütun -1 <=19)
+            {
+                if (alan_2d[(ksütun - 1), (ksatir)] == 0)
+                {
+                    yakin_mayin++;
+                }
+                
+            }
+            if (ksütun +1 <= 19)
+            {
+             
+                if (alan_2d[(ksütun + 1), (ksatir)] == 0)
+                {
+                    yakin_mayin++;
+                }
+            }
+            if (ksatir+1 <= 19)
+            {
+               
+                if (alan_2d[(ksütun), (ksatir + 1)] == 0)
+                {
+                    yakin_mayin++;
+                }
+            }
+            if (ksatir-1 <= 19)
+            {
+                if (alan_2d[(ksütun), (ksatir - 1)] == 0)
+                {
+                    yakin_mayin++;
+                }
+               
+            }
+            if (ksütun-1 <= 19 && ksatir-1 <= 19)
+            {
+                if (alan_2d[(ksütun - 1), (ksatir - 1)] == 0)
+                {
+                    yakin_mayin++;
+                }
+
+            }
+            if (ksütun +1 <= 19 && ksatir-1 <= 19)
+            {
+               
+                if (alan_2d[(ksütun + 1), (ksatir - 1)] == 0)
+                {
+                    yakin_mayin++;
+                }
+         
+            }
+            if (ksütun-1 <= 19 && ksatir +1 <= 19)
+            {
+              
+                if (alan_2d[(ksütun - 1), (ksatir + 1)] == 0)
+                {
+                    yakin_mayin++;
+                }
+
+            }
+            if (ksütun + 1 <= 19 && ksatir + 1 <= 19)
+            {
+
+                if (alan_2d[(ksütun + 1), (ksatir + 1)] == 0)
+                {
+                    yakin_mayin++;
+                }
+            }
+            yakin_mayin_sayisi.Text = yakin_mayin.ToString();
+
+        }
 
         private void yrdm_btn_Click(object sender, EventArgs e)
         {
