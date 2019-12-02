@@ -19,10 +19,11 @@ namespace Mayın_Tarlası
         }
         string yön;
         int dakika , saniye ;
-        int satir, sütun;
+        int satir=20, sütun=20;
+        int alan_sütun = 10, alan_satir = 19;
         string oyuncu_ismi;
-
-
+        int bomba_sayisi = 0;
+        int[,] alan_2d = new int[20, 20] ;
 
 
         private void mayin_tarlasi_Load(object sender, EventArgs e)
@@ -63,47 +64,21 @@ namespace Mayın_Tarlası
             }
 
 
+            oyun_kontrol();
+
+
 
         }
 
-        private void yrdm_btn_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Yunus Emre Eraslan\n" + "Görsel Programlama 2. Proje ");
-        }
+        
+    
+       
 
-        private void skor_goster_Click(object sender, EventArgs e)
-        {
-            string dosya_yolu = @"C:\Users\DELL\Desktop\oynayanlar.txt";
-            System.Diagnostics.Process.Start(dosya_yolu);
-        }
-
-        private void cell_paint(object sender, TableLayoutCellPaintEventArgs e)
-        {
-
-        }
-        Point selectedCell = new Point();
-        private void tableLayoutPanel1_MouseClick(object sender, MouseEventArgs e)
-        {
-          
-          
-                if (e.Button == MouseButtons.Right)
-                {
-
-                    //show contextMenuStrip
-                    selectedCell = new Point(e.X / (tableLayoutPanel1.Width / tableLayoutPanel1.ColumnCount), e.Y / (tableLayoutPanel1.Height / tableLayoutPanel1.RowCount));
-                }
-            
-        }
-
-        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
 
         public void oyun_baslat_Click(object sender, EventArgs e)
         {
             bool zorluk_secimi=false;
-            int bomba_sayisi = 0;
+            
             if (radioButton1.Checked == true)
             {
                 bomba_sayisi = 40;
@@ -134,10 +109,127 @@ namespace Mayın_Tarlası
                 MessageBox.Show("Lütfen Zorluk Seçimi Yapınız.");
             }
 
-      
-            
+
+            for (int i = 0; i < sütun; i++)
+            {
+                for (int j = 0; j < satir; j++)
+                {
+                    alan_2d[i, j] = 1;
+                }
+            }
+            // bombasız alanlara 1 bombalı alanlara 0 dedim
+            bomba_yerlesimi();
+
+
 
         }
+
+        public void oyun_kontrol()
+        {
+            
+            if (yön=="aşağı")
+            {
+                alan_satir++;
+                if (alan_satir==20)
+                {
+                    MessageBox.Show("Çok aşağı gittiniz");
+                    alan_satir--;
+                }
+                else
+                {
+                    if (alan_2d[alan_sütun, alan_satir] == 0)
+                    {
+                        oyun_kaybetti();
+                    }
+                }
+                
+            }
+           else if (yön == "yukarı")
+            {
+                --alan_satir;
+            
+                if (alan_satir == 0)
+                {
+                    oyun_kazandi();
+                }
+
+                else
+                {
+                    if (alan_2d[alan_sütun, alan_satir] == 0)
+                    {
+                        oyun_kaybetti();
+                    }
+                }
+
+            }
+           else if (yön == "sağ")
+            {
+                alan_sütun--;
+                if (alan_sütun == -1)
+                {
+                    MessageBox.Show("Çok sağa gittiniz");
+                    alan_sütun++;
+                }
+                else
+                {
+                    if (alan_2d[alan_sütun, alan_satir] == 0)
+                    {
+                        oyun_kaybetti();
+                    }
+                }
+
+            }
+          else  if (yön == "sol")
+            {
+                alan_sütun++;
+                if (alan_sütun == 20)
+                {
+                    MessageBox.Show("Çok sola gittiniz");
+                    alan_sütun--;
+                }
+                else
+                {
+                    if (alan_2d[alan_sütun, alan_satir] == 0)
+                    {
+                        oyun_kaybetti();
+                    }
+                }
+
+            }
+
+
+        }
+
+        public void bomba_yerlesimi()
+        {
+            int i=1;
+            int bomba_satir=0, bomba_sütun=0;
+            Random rassal = new Random() ;
+            while (i <= bomba_sayisi)
+            {
+                bomba_sütun = rassal.Next(0, 20);
+                bomba_satir = rassal.Next(0, 20);
+                if (alan_2d[bomba_sütun, bomba_satir] != 0)
+                {
+                    alan_2d[bomba_sütun, bomba_satir] = 0;
+                    i++;
+                }
+                else
+                {
+                    continue;
+                }
+            }          
+        }
+        public void oyun_kaybetti()
+        {
+            MessageBox.Show("oyunu kaybettiniz");
+        }
+        public void oyun_kazandi()
+        {
+            MessageBox.Show("tebrikler oyunu kazandınız.");
+        }
+
+
 
         private void timer1_Tick(object sender, EventArgs e)
         {
@@ -166,6 +258,29 @@ namespace Mayın_Tarlası
             }
 
             saniye++;
+
+        }
+
+
+        private void yrdm_btn_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Yunus Emre Eraslan\n" + "Görsel Programlama 2. Proje ");
+        }
+
+        private void skor_goster_Click(object sender, EventArgs e)
+        {
+            string dosya_yolu = @"C:\Users\DELL\Desktop\oynayanlar.txt";
+            System.Diagnostics.Process.Start(dosya_yolu);
+        }
+
+        private void cell_paint(object sender, TableLayoutCellPaintEventArgs e)
+        {
+
+        }
+
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
 
         }
     }
